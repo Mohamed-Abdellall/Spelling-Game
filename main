@@ -1,0 +1,77 @@
+from tkinter import Tk, Entry, Label, Button
+import random
+import enchant
+
+
+score = 0
+d = enchant.Dict("en_US")
+used_words = []
+def check():
+    ch = d.check(wordPlay)
+alpha = "abcdefghijklmnopqrstuvwxyz"
+a = list(alpha)
+ran = random.choice(a)
+
+
+def changepage():
+    global pagenum, timer_label, entry_widget
+    for widget in root.winfo_children():
+        widget.destroy()
+    if pagenum == 1:
+        pagenum = 2
+        Label(root, text = "Lowercase words that start with the letter: " + ran).pack()
+        entry_widget = Entry(root, width = 30, font=("Impact", 10))
+        entry_widget.pack(fill="none", expand=True)
+        '''Button(root, text="Enter", command=playGame(), font=("Impact", 30)).pack()'''
+        timer_label = Label(root, text="", font=("Impact", 20))
+        timer_label.place(x=500, y=15)
+        clock(60)
+
+#Below block is from main. Not to be used in GUI.
+def playing():
+    global score
+    wordPlay = input("Enter word:")
+    d.check(wordPlay)
+    if not d.check(wordPlay) or wordPlay[0] != ran:
+        print("Try again.")
+    if wordPlay in used_words:
+        print("Already used!")
+    elif d.check(wordPlay) and wordPlay[0] == ran:
+        print("+" + str(len(wordPlay) * 100))
+        score += len(wordPlay) * 100
+        used_words.append(wordPlay)
+        print("Current score: " + str(score))
+print(ran)
+
+#Function to actually play in GUI.
+def playGame():
+    global score
+    global ran
+    global entry_widget
+    d.check(entry_widget)
+    if not d.check(entry_widget) or entry_widget[0] != ran:
+        try_label = tk.Label(root, text="Try again").pack()
+        try_label.after(2000, try_label.destroy)
+    elif entry_widget in used_words:
+        used_label = tk.Label(root, text="Already used!").pack()
+        used_label.after(2000, used_label.destroy)
+    elif d.check(entry_widget) and entry_widget[0] == ran:
+        good_label = tk.Label(root, text="+" + str(len(Entry) * 100)).pack()
+        good_label.after(2000, good_label.destroy)
+        used_words.append(Entry)
+
+
+# Timer
+def clock(count):
+    # change text in label
+    timer_label['text'] = count
+    if count > 0:
+        # call countdown again 1s
+        root.after(1000, clock, count - 1)
+root = Tk()
+root.geometry("600x400")
+root.title('SpellIt')
+Label(root, text="Spell It!", font=("Impact", 44)).pack()
+Button(root, text="Start", command=changepage, font=("Impact", 30)).pack()
+pagenum = 1
+root.mainloop()
